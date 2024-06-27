@@ -105,12 +105,6 @@ namespace ModularEncountersSystems.Behavior {
 		private bool _behaviorActionG;
 		private bool _behaviorActionH;
 
-		private JetpackInhibitor _jetpackInhibitorLogic;
-		private DrillInhibitor _drillInhibitorLogic;
-		private NanobotInhibitor _nanobotInhibitorLogic;
-		private JumpDriveInhibitor _jumpInhibitorLogic;
-		private PlayerInhibitor _playerInhibitorLogic;
-
 		private List<IMyCubeGrid> _currentGrids;
 		private List<IMyCockpit> _debugCockpits;
 
@@ -168,12 +162,6 @@ namespace ModularEncountersSystems.Behavior {
 		public bool BehaviorActionF { get { return _behaviorActionF; } set { _behaviorActionF = value; } }
 		public bool BehaviorActionG { get { return _behaviorActionG; } set { _behaviorActionG = value; } }
 		public bool BehaviorActionH { get { return _behaviorActionH; } set { _behaviorActionH = value; } }
-
-		public JetpackInhibitor JetpackInhibitorLogic { get { return _jetpackInhibitorLogic; } set { _jetpackInhibitorLogic = value; } }
-		public DrillInhibitor DrillInhibitorLogic { get { return _drillInhibitorLogic; } set { _drillInhibitorLogic = value; } }
-		public NanobotInhibitor NanobotInhibitorLogic { get { return _nanobotInhibitorLogic; } set { _nanobotInhibitorLogic = value; } }
-		public JumpDriveInhibitor JumpInhibitorLogic { get { return _jumpInhibitorLogic; } set { _jumpInhibitorLogic = value; } }
-		public PlayerInhibitor PlayerInhibitorLogic { get { return _playerInhibitorLogic; } set { _playerInhibitorLogic = value; } }
 
 		public BlockEntity RemoteControlBlockEntity { 
 			

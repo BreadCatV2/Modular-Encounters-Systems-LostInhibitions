@@ -268,10 +268,6 @@ namespace ModularEncountersSystems.Terminal {
 
 			sb.AppendLine().Append("[About Upgrades]").AppendLine();
 			sb.Append("Below is a list of the current upgrades that may be available for purchase at this upgrade station.").AppendLine();
-			sb.Append(" - Anti Jetpack Inhibitor: This provides immunity from Jetpack Inhibitors at the expense of suit energy. When this upgrade is at max level, it provides immunity at zero energy cost.").AppendLine();
-			sb.Append(" - Anti Hand Drill Inhibitor: This provides immunity from Hand Drill Inhibitors at the expense of suit energy. When this upgrade is at max level, it provides immunity at zero energy cost.").AppendLine();
-			sb.Append(" - Anti Hand Drill Inhibitor: This provides immunity from Personnel Inhibitors at the expense of suit energy. When this upgrade is at max level, it provides immunity at zero energy cost.").AppendLine();
-			sb.Append(" - Anti Energy Inhibitor: This provides immunity from Energy Inhibitors in the form of reduced suit energy consumption. When this upgrade is at max level, it provides immunity at zero energy cost.").AppendLine();
 			sb.Append(" - Solar Charging: This allows you to passively recharge suit energy while in direct sunlight. Higher levels of this upgrade allow faster charging.").AppendLine();
 			sb.Append(" - Damage Reduction: This upgrade reduces the amount of damage your character takes from all sources. Higher levels of this upgrade provide further damage reduction.").AppendLine();
 

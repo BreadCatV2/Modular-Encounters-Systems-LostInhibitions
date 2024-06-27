@@ -33,17 +33,6 @@ namespace ModularEncountersSystems.Spawning {
 
                 _firstRun = true;
 
-                try {
-
-                    var blockTest = new InhibitorLogic();
-                    Action blockTestAction = blockTest.RunTick100;
-
-                } catch (Exception) {
-
-                    SpawnGroupManager.AddonDetected = true;
-
-                }
-
             }
 
             Timer = 0;

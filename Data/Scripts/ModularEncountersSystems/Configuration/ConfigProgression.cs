@@ -38,16 +38,13 @@ namespace ModularEncountersSystems.Configuration {
 
 	  Thank you.
 		 
+		:3 tehe oopsie woopsie
 	*/
 
 	public class ConfigProgression{
 		
 		public string ModVersion {get; set;}
 
-		public bool AllowAntiJetpackInhibitorSuitUpgrade;
-		public bool AllowAntiHandDrillInhibitorSuitUpgrade;
-		public bool AllowAntiPersonnelInhibitorSuitUpgrade;
-		public bool AllowAntiEnergyInhibitorSuitUpgrade;
 		public bool AllowSolarChargingSuitUpgrade;
 		public bool AllowDamageReductionSuitUpgrade;
 
@@ -62,19 +59,11 @@ namespace ModularEncountersSystems.Configuration {
 			
 			ModVersion = MES_SessionCore.ModVersion;
 
-			AllowAntiJetpackInhibitorSuitUpgrade = true;
-			AllowAntiHandDrillInhibitorSuitUpgrade = true;
-			AllowAntiPersonnelInhibitorSuitUpgrade = true;
-			AllowAntiEnergyInhibitorSuitUpgrade = true;
 			AllowSolarChargingSuitUpgrade = true;
 			AllowDamageReductionSuitUpgrade = true;
 
 			EditorReference = new Dictionary<string, Func<string, object, bool>> {
 
-				{"AllowAntiJetpackInhibitorSuitUpgrade", (s, o) => EditorTools.SetCommandValueBool(s, ref AllowAntiJetpackInhibitorSuitUpgrade) },
-				{"AllowAntiHandDrillInhibitorSuitUpgrade", (s, o) => EditorTools.SetCommandValueBool(s, ref AllowAntiHandDrillInhibitorSuitUpgrade) },
-				{"AllowAntiPersonnelInhibitorSuitUpgrade", (s, o) => EditorTools.SetCommandValueBool(s, ref AllowAntiPersonnelInhibitorSuitUpgrade) },
-				{"AllowAntiEnergyInhibitorSuitUpgrade", (s, o) => EditorTools.SetCommandValueBool(s, ref AllowAntiEnergyInhibitorSuitUpgrade) },
 				{"AllowSolarChargingInhibitorSuitUpgrade", (s, o) => EditorTools.SetCommandValueBool(s, ref AllowSolarChargingSuitUpgrade) },
 				{"AllowDamageReductionInhibitorSuitUpgrade", (s, o) => EditorTools.SetCommandValueBool(s, ref AllowDamageReductionSuitUpgrade) },
 

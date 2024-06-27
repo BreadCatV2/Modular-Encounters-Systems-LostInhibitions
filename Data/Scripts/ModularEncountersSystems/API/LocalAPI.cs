@@ -46,7 +46,6 @@ namespace ModularEncountersSystems.API {
 			dict.Add("ChatCommand", new Action<string, MatrixD, long, ulong>(ChatManager.ChatFromApi));
 			dict.Add("CustomSpawnRequest", new Func<List<string>, MatrixD, Vector3, bool, string, string, bool>(CustomSpawnRequest));
 			dict.Add("GetDespawnCoords", new Func<IMyCubeGrid, Vector3D>(GetDespawnCoords));
-			dict.Add("GetPlayerInhibitorData", new Action<long, string, List<MyTuple<IMyRadioAntenna, DateTime>>>(GetPlayerInhibitorData));
 			dict.Add("GetSpawnGroupBlackList", new Func<List<string>>(GetSpawnGroupBlackList));
 			dict.Add("GetSpawnGroupsByType", new Action<string, List<string>>(GetSpawnGroupsByType));
 			dict.Add("GetNpcNameBlackList", new Func<List<string>>(GetNpcNameBlackList));
@@ -167,28 +166,6 @@ namespace ModularEncountersSystems.API {
 				return Vector3D.Zero;
 
 			return npcGrid.Npc.EndCoords;
-
-		}
-
-		public static void GetPlayerInhibitorData(long playerIdentityId, string inhibitorType, List<MyTuple<IMyRadioAntenna, DateTime>> inhibitorData) {
-
-			var player = PlayerManager.GetPlayerWithIdentityId(playerIdentityId);
-
-			if (player == null)
-				return;
-
-			if (inhibitorData == null)
-				inhibitorData = new List<MyTuple<IMyRadioAntenna, DateTime>>();
-
-			inhibitorData.Clear();
-
-			var inhibType = InhibitorLogic.GetInhibitorType(inhibitorType);
-
-			if (!player.InhibitorIdsInRange.ContainsKey(inhibType))
-				return;
-
-			foreach (var block in player.InhibitorIdsInRange[inhibType])
-				inhibitorData.Add(block);
 
 		}
 

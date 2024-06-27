@@ -10,10 +10,6 @@ namespace ModularEncountersSystems.Progression {
 	public enum SuitUpgradeTypes {
 	
 		None,
-		JetpackInhibitor,
-		HandDrillInhibitor,
-		PersonnelInhibitor,
-		EnergyInhibitor,
 		SolarCharging,
 		DamageReduction,
 		PassiveIncome,
@@ -31,10 +27,6 @@ namespace ModularEncountersSystems.Progression {
 		[ProtoMember(3)] public byte Points;
 
 		//Suit Upgrades
-		[ProtoMember(4)] public byte JetpackInhibitorSuitUpgradeLevel;
-		[ProtoMember(5)] public byte DrillInhibitorSuitUpgradeLevel;
-		[ProtoMember(6)] public byte PersonnelInhibitorSuitUpgradeLevel;
-		[ProtoMember(7)] public byte EnergyInhibitorSuitUpgradeLevel;
 		[ProtoMember(8)] public byte SolarChargingSuitUpgradeLevel;
 		[ProtoMember(9)] public byte DamageReductionSuitUpgradeLevel;
 
@@ -48,10 +40,6 @@ namespace ModularEncountersSystems.Progression {
 
 			Points = 0;
 
-			JetpackInhibitorSuitUpgradeLevel = 0;
-			DrillInhibitorSuitUpgradeLevel = 0;
-			PersonnelInhibitorSuitUpgradeLevel = 0;
-			EnergyInhibitorSuitUpgradeLevel = 0;
 			SolarChargingSuitUpgradeLevel = 0;
 			DamageReductionSuitUpgradeLevel = 0;
 
@@ -67,18 +55,6 @@ namespace ModularEncountersSystems.Progression {
 				return false;
 
 			if (this.Points != otherContainer.Points)
-				return false;
-
-			if (this.JetpackInhibitorSuitUpgradeLevel != otherContainer.JetpackInhibitorSuitUpgradeLevel)
-				return false;
-
-			if (this.DrillInhibitorSuitUpgradeLevel != otherContainer.DrillInhibitorSuitUpgradeLevel)
-				return false;
-
-			if (this.PersonnelInhibitorSuitUpgradeLevel != otherContainer.PersonnelInhibitorSuitUpgradeLevel)
-				return false;
-
-			if (this.EnergyInhibitorSuitUpgradeLevel != otherContainer.EnergyInhibitorSuitUpgradeLevel)
 				return false;
 
 			if (this.SolarChargingSuitUpgradeLevel != otherContainer.SolarChargingSuitUpgradeLevel)
@@ -99,18 +75,6 @@ namespace ModularEncountersSystems.Progression {
 				return;
 
 			}
-				
-			if (type == SuitUpgradeTypes.JetpackInhibitor)
-				JetpackInhibitorSuitUpgradeLevel++;
-
-			if (type == SuitUpgradeTypes.HandDrillInhibitor)
-				DrillInhibitorSuitUpgradeLevel++;
-
-			if (type == SuitUpgradeTypes.PersonnelInhibitor)
-				PersonnelInhibitorSuitUpgradeLevel++;
-
-			if (type == SuitUpgradeTypes.EnergyInhibitor)
-				EnergyInhibitorSuitUpgradeLevel++;
 
 			if (type == SuitUpgradeTypes.SolarCharging)
 				SolarChargingSuitUpgradeLevel++;
@@ -128,18 +92,6 @@ namespace ModularEncountersSystems.Progression {
 			if (type == SuitUpgradeTypes.None)
 				return "None";
 
-			if (type == SuitUpgradeTypes.JetpackInhibitor)
-				return "Anti Jetpack Inhibitor";
-
-			if (type == SuitUpgradeTypes.HandDrillInhibitor)
-				return "Anti Hand Drill Inhibitor";
-
-			if (type == SuitUpgradeTypes.PersonnelInhibitor)
-				return "Anti Personnel Inhibitor";
-
-			if (type == SuitUpgradeTypes.EnergyInhibitor)
-				return "Anti Energy Inhibitor";
-
 			if (type == SuitUpgradeTypes.SolarCharging)
 				return "Solar Charging";
 
@@ -155,18 +107,6 @@ namespace ModularEncountersSystems.Progression {
 			if (type == SuitUpgradeTypes.None)
 				return "No upgrade selected";
 
-			if (type == SuitUpgradeTypes.JetpackInhibitor)
-				return "Protects against jetpack inhibitor effect in exchange for suit energy. Higher levels of this upgrade use less energy.";
-
-			if (type == SuitUpgradeTypes.HandDrillInhibitor)
-				return "Protects against hand drill inhibitor effect in exchange for suit energy. Higher levels of this upgrade use less energy.";
-
-			if (type == SuitUpgradeTypes.PersonnelInhibitor)
-				return "Protects against personnel inhibitor effect in exchange for suit energy. Higher levels of this upgrade use less energy.";
-
-			if (type == SuitUpgradeTypes.EnergyInhibitor)
-				return "Protects against energy inhibitor effect in exchange for suit energy. Higher levels of this upgrade use less energy.";
-
 			if (type == SuitUpgradeTypes.SolarCharging)
 				return "Allows player to regain suit energy while in direct sunlight. Higher levels of this upgrade increase accumulated energy.";
 
@@ -181,18 +121,6 @@ namespace ModularEncountersSystems.Progression {
 
 			if (type == SuitUpgradeTypes.None)
 				return 0;
-
-			if (type == SuitUpgradeTypes.JetpackInhibitor)
-				return JetpackInhibitorSuitUpgradeLevel;
-
-			if (type == SuitUpgradeTypes.HandDrillInhibitor)
-				return DrillInhibitorSuitUpgradeLevel;
-
-			if (type == SuitUpgradeTypes.PersonnelInhibitor)
-				return PersonnelInhibitorSuitUpgradeLevel;
-
-			if (type == SuitUpgradeTypes.EnergyInhibitor)
-				return EnergyInhibitorSuitUpgradeLevel;
 
 			if (type == SuitUpgradeTypes.SolarCharging)
 				return SolarChargingSuitUpgradeLevel;
@@ -260,18 +188,6 @@ namespace ModularEncountersSystems.Progression {
 		public static bool IsUpgradeAllowedInConfig(SuitUpgradeTypes upgrade) {
 
 			if (upgrade == SuitUpgradeTypes.None)
-				return false;
-
-			if (upgrade == SuitUpgradeTypes.JetpackInhibitor && !Settings.Progression.AllowAntiJetpackInhibitorSuitUpgrade)
-				return false;
-
-			if (upgrade == SuitUpgradeTypes.HandDrillInhibitor && !Settings.Progression.AllowAntiHandDrillInhibitorSuitUpgrade)
-				return false;
-
-			if (upgrade == SuitUpgradeTypes.PersonnelInhibitor && !Settings.Progression.AllowAntiPersonnelInhibitorSuitUpgrade)
-				return false;
-
-			if (upgrade == SuitUpgradeTypes.EnergyInhibitor && !Settings.Progression.AllowAntiEnergyInhibitorSuitUpgrade)
 				return false;
 
 			if (upgrade == SuitUpgradeTypes.SolarCharging && !Settings.Progression.AllowSolarChargingSuitUpgrade)

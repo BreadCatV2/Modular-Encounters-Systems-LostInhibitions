@@ -166,60 +166,7 @@ namespace ModularEncountersSystems.Spawning.Manipulation {
 			blocks.Remove(oldBlock);
 			blocks.Add(newBlock);
 
-			SetDefaultInhibitorRanges(newBlock, data);
-
 			return true;
-
-		}
-
-		public static void SetDefaultInhibitorRanges(MyObjectBuilder_CubeBlock block, NpcData data) {
-
-			var antenna = block as MyObjectBuilder_RadioAntenna;
-
-			if (antenna == null)
-				return;
-
-			if (antenna.SubtypeName.StartsWith("MES-Suppressor-Nanobots-")) {
-
-				antenna.BroadcastRadius = 1000;
-				data.Attributes.UseNanobotDisable = true;
-
-			}
-
-			if (antenna.SubtypeName.StartsWith("MES-Suppressor-JumpDrive-")) {
-
-				antenna.BroadcastRadius = 6000;
-				data.Attributes.UseJumpDisable = true;
-
-			}
-
-			if (antenna.SubtypeName.StartsWith("MES-Suppressor-Jetpack-")) {
-
-				antenna.BroadcastRadius = 1000;
-				data.Attributes.UseJetpackDisable = true;
-
-			}
-
-			if (antenna.SubtypeName.StartsWith("MES-Suppressor-Drill-")) {
-
-				antenna.BroadcastRadius = 500;
-				data.Attributes.UseDrillDisable = true;
-
-			}
-
-			if (antenna.SubtypeName.StartsWith("MES-Suppressor-Player-")) {
-
-				antenna.BroadcastRadius = 1000;
-				data.Attributes.UsePlayerDisable = true;
-
-			}
-
-			if (antenna.SubtypeName.StartsWith("MES-Suppressor-Energy-")) {
-
-				antenna.BroadcastRadius = 1000;
-				data.Attributes.UseEnergyDisable = true;
-
-			}
 
 		}
 

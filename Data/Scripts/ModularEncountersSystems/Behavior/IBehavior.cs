@@ -45,12 +45,6 @@ namespace ModularEncountersSystems.Behavior {
 		bool BehaviorActionG { get; set; }
 		bool BehaviorActionH { get; set; }
 
-		JetpackInhibitor JetpackInhibitorLogic { get; set; }
-		DrillInhibitor DrillInhibitorLogic { get; set; }
-		NanobotInhibitor NanobotInhibitorLogic { get; set; }
-		JumpDriveInhibitor JumpInhibitorLogic { get; set; }
-		PlayerInhibitor PlayerInhibitorLogic { get; set; }
-
 		void BehaviorInit(IMyRemoteControl remoteControl);
 		//List<IMyCubeGrid> CurrentGrids { get; }
 		GridEntity CurrentGrid { get; }

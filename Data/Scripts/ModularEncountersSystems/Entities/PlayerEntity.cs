@@ -24,15 +24,10 @@ namespace ModularEncountersSystems.Entities {
 		public bool IsParentEntitySeat;
 		public bool RemoteControlling;
 
-		public Dictionary<InhibitorTypes, List<MyTuple<IMyRadioAntenna, DateTime>>> InhibitorIdsInRange;
 
 		public bool PlayerEntityChanged;
 
 		public bool ItemConsumeEventRegistered;
-		public ConsumableItemTimer JetpackInhibitorNullifier;
-		public ConsumableItemTimer DrillInhibitorNullifier;
-		public ConsumableItemTimer PlayerInhibitorNullifier;
-		public ConsumableItemTimer EnergyInhibitorNullifier;
 
 		public PlayerSolarModule SolarModule;
 
@@ -158,15 +153,6 @@ namespace ModularEncountersSystems.Entities {
 
 			_progression = null;
 
-			InhibitorIdsInRange = new Dictionary<InhibitorTypes, List<MyTuple<IMyRadioAntenna, DateTime>>>{
-
-				{InhibitorTypes.Drill, new List<MyTuple<IMyRadioAntenna, DateTime>>() },
-				{InhibitorTypes.Energy, new List<MyTuple<IMyRadioAntenna, DateTime>>() },
-				{InhibitorTypes.Jetpack, new List<MyTuple<IMyRadioAntenna, DateTime>>() },
-				{InhibitorTypes.Personnel, new List<MyTuple<IMyRadioAntenna, DateTime>>() },
-
-			};
-
 			LinkedGrids = new List<GridEntity>();
 
 			MyVisualScriptLogicProvider.PlayerDisconnected += PlayerDisconnect;
@@ -186,100 +172,10 @@ namespace ModularEncountersSystems.Entities {
 
 		}
 
-		public void AddInhibitorToPlayer(IMyRadioAntenna id, InhibitorTypes type) {
-
-			foreach (var block in InhibitorIdsInRange[type])
-				if (block.Item1 == id)
-					return;
-
-			InhibitorIdsInRange[type].Add(new MyTuple<IMyRadioAntenna, DateTime>(id, MyAPIGateway.Session.GameDateTime));
-
-		}
-
-		public void RemoveInhibitorFromPlayer(IMyRadioAntenna id, InhibitorTypes type) {
-
-			for (int i = InhibitorIdsInRange[type].Count - 1; i >= 0; i--) {
-
-				var block = InhibitorIdsInRange[type][i];
-
-				if (block.Item1 == id) {
-
-					InhibitorIdsInRange[type].RemoveAt(i);
-
-				}
-
-			}
-
-		}
-
 		public void ItemConsumedEvent(IMyCharacter character, MyDefinitionId id) {
 
 			if (!ActiveEntity() || Player?.Character == null || Player.Character != character)
 				return;
-
-
-			if (id.SubtypeName == "JetpackInhibitorBlocker") {
-
-				if (JetpackInhibitorNullifier == null || !JetpackInhibitorNullifier.EffectActive()) {
-
-					JetpackInhibitorNullifier = new ConsumableItemTimer(30, Player.IdentityId, "Jetpack Inhibitor Nullifier");
-					TaskProcessor.Tasks.Add(JetpackInhibitorNullifier);
-
-
-				} else {
-
-					JetpackInhibitorNullifier.ResetTimer(30);
-
-				}
-			
-			}
-
-			if (id.SubtypeName == "DrillInhibitorBlocker") {
-
-				if (DrillInhibitorNullifier == null || !DrillInhibitorNullifier.EffectActive()) {
-
-					DrillInhibitorNullifier = new ConsumableItemTimer(30, Player.IdentityId, "Drill Inhibitor Nullifier");
-					TaskProcessor.Tasks.Add(DrillInhibitorNullifier);
-
-
-				} else {
-
-					DrillInhibitorNullifier.ResetTimer(30);
-
-				}
-
-			}
-
-			if (id.SubtypeName == "PlayerInhibitorBlocker") {
-
-				if (PlayerInhibitorNullifier == null || !PlayerInhibitorNullifier.EffectActive()) {
-
-					PlayerInhibitorNullifier = new ConsumableItemTimer(30, Player.IdentityId, "Player Inhibitor Nullifier");
-					TaskProcessor.Tasks.Add(PlayerInhibitorNullifier);
-
-				} else {
-
-					PlayerInhibitorNullifier.ResetTimer(30);
-
-				}
-
-			}
-
-			if (id.SubtypeName == "EnergyInhibitorBlocker") {
-
-				if (EnergyInhibitorNullifier == null || !EnergyInhibitorNullifier.EffectActive()) {
-
-					EnergyInhibitorNullifier = new ConsumableItemTimer(30, Player.IdentityId, "Energy Inhibitor Nullifier", true);
-					TaskProcessor.Tasks.Add(EnergyInhibitorNullifier);
-
-
-				} else {
-
-					EnergyInhibitorNullifier.ResetTimer(30);
-
-				}
-
-			}
 
 			if (id.SubtypeName == "SkeletonKey") {
 			
@@ -400,9 +296,6 @@ namespace ModularEncountersSystems.Entities {
 			if (id != Player.IdentityId)
 				return;
 
-			JetpackInhibitorNullifier?.ExpireConsumableEffect();
-			DrillInhibitorNullifier?.ExpireConsumableEffect();
-			PlayerInhibitorNullifier?.ExpireConsumableEffect();
 			RegisterConsumeEvent(false);
 
 		}

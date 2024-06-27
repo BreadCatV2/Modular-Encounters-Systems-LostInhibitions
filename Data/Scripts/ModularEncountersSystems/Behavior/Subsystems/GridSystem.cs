@@ -416,14 +416,6 @@ namespace ModularEncountersSystems.Behavior.Subsystems {
 						if (states[j] == SwitchEnum.Toggle)
 							changeTo = changeTo ? false : true;
 
-						if (logic as InhibitorLogic != null) {
-
-							var inhibitor = logic as InhibitorLogic;
-							inhibitor.Toggle(changeTo);
-							break;
-
-						}
-
 						block.Enabled = changeTo;
 						break;
 

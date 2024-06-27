@@ -325,12 +325,6 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool SetGridToStatic;
 		public bool SetGridToDynamic;
 
-		public BoolEnum UseJetpackInhibitorEffect; 
-		public BoolEnum UseDrillInhibitorEffect; 
-		public BoolEnum UseNanobotInhibitorEffect; 
-		public BoolEnum UseJumpInhibitorEffect; 
-		public BoolEnum UsePlayerInhibitorEffect;
-
 		public bool ChangeTurretTargetingParameters; //Implement
 		public string TurretTargetType; //Implement
 		public List<string> TurretTypesForTargetChanges; //Implement
@@ -738,12 +732,6 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			SetGridToStatic = false;
 			SetGridToDynamic = false;
 
-			UseJetpackInhibitorEffect = BoolEnum.None;
-			UseDrillInhibitorEffect = BoolEnum.None;
-			UseNanobotInhibitorEffect = BoolEnum.None;
-			UseJumpInhibitorEffect = BoolEnum.None;
-			UsePlayerInhibitorEffect = BoolEnum.None;
-
 			ChangeTurretTargetingParameters = false;
 			TurretTargetType = "";
 			TurretTypesForTargetChanges = new List<string>();
@@ -1059,11 +1047,6 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"ClearCustomPatrolReference", (s, o) => TagParse.TagBoolCheck(s, ref ClearCustomPatrolReference) },
 				{"SetGridToStatic", (s, o) => TagParse.TagBoolCheck(s, ref SetGridToStatic) },
 				{"SetGridToDynamic", (s, o) => TagParse.TagBoolCheck(s, ref SetGridToDynamic) },
-				{"UseJetpackInhibitorEffect", (s, o) => TagParse.TagBoolEnumCheck(s, ref UseJetpackInhibitorEffect) },
-				{"UseDrillInhibitorEffect", (s, o) => TagParse.TagBoolEnumCheck(s, ref UseDrillInhibitorEffect) },
-				{"UseNanobotInhibitorEffect", (s, o) => TagParse.TagBoolEnumCheck(s, ref UseNanobotInhibitorEffect) },
-				{"UseJumpInhibitorEffect", (s, o) => TagParse.TagBoolEnumCheck(s, ref UseJumpInhibitorEffect) },
-				{"UsePlayerInhibitorEffect", (s, o) => TagParse.TagBoolEnumCheck(s, ref UsePlayerInhibitorEffect) },
 				{"ChangeTurretTargetingParameters", (s, o) => TagParse.TagBoolCheck(s, ref ChangeTurretTargetingParameters) },
 				{"TurretTargetType", (s, o) => TagParse.TagStringCheck(s, ref TurretTargetType) },
 				{"TurretTypesForTargetChanges", (s, o) => TagParse.TagStringListCheck(s, ref TurretTypesForTargetChanges) },

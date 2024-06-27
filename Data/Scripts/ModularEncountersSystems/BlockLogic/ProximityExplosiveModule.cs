@@ -62,7 +62,7 @@ namespace ModularEncountersSystems.BlockLogic {
 			//Check Player Distances and Status
 			foreach (var player in PlayerManager.Players) {
 
-				if (!player.ActiveEntity() || player.IsParentEntitySeat || (player.PlayerInhibitorNullifier != null && player.PlayerInhibitorNullifier.EffectActive())) {
+				if (!player.ActiveEntity() || player.IsParentEntitySeat) {
 
 					RemovePlayer(player);
 					continue;
@@ -75,17 +75,6 @@ namespace ModularEncountersSystems.BlockLogic {
 
 					RemovePlayer(player);
 					continue;
-
-				}
-
-				if (distance <= _antennaRange) {
-
-					if (!_playersInBlockRange.Contains(player)) {
-
-						MyVisualScriptLogicProvider.ShowNotification("WARNING: Prolonged Exposure To Player Inhibitor Field May Be Fatal!", 5000, "Red", player.Player.IdentityId);
-						_playersInBlockRange.Add(player);
-
-					}
 
 				}
 			

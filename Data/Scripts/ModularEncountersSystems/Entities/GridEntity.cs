@@ -66,7 +66,6 @@ namespace ModularEncountersSystems.Entities {
 		public List<BlockEntity> Gravity;
 		public List<BlockEntity> Guns;
 		public List<BlockEntity> Gyros;
-		public List<BlockEntity> Inhibitors;
 		public List<BlockEntity> JumpDrives;
 		public List<BlockEntity> Mechanical;
 		public List<BlockEntity> Medical;
@@ -137,7 +136,6 @@ namespace ModularEncountersSystems.Entities {
 			Gravity = new List<BlockEntity>();
 			Guns = new List<BlockEntity>();
 			Gyros = new List<BlockEntity>();
-			Inhibitors = new List<BlockEntity>();
 			JumpDrives = new List<BlockEntity>();
 			Mechanical = new List<BlockEntity>();
 			Medical = new List<BlockEntity>();
@@ -169,7 +167,6 @@ namespace ModularEncountersSystems.Entities {
 			BlockListReference.Add(BlockTypeEnum.Gravity, Gravity);
 			BlockListReference.Add(BlockTypeEnum.Guns, Guns);
 			BlockListReference.Add(BlockTypeEnum.Gyros, Gyros);
-			BlockListReference.Add(BlockTypeEnum.Inhibitors, Inhibitors);
 			BlockListReference.Add(BlockTypeEnum.JumpDrives, JumpDrives);
 			BlockListReference.Add(BlockTypeEnum.Mechanical, Mechanical);
 			BlockListReference.Add(BlockTypeEnum.Medical, Medical);
@@ -634,13 +631,6 @@ namespace ModularEncountersSystems.Entities {
 					assignedBlock = AddBlock(terminalBlock, Guns);
 
 				}
-
-			}
-
-			//Inhibitors
-			if (ArmorModuleReplacement.SmallModules.Contains(block.BlockDefinition.Id) || ArmorModuleReplacement.LargeModules.Contains(block.BlockDefinition.Id)) {
-
-				assignedBlock = AddBlock(terminalBlock, Inhibitors);
 
 			}
 
@@ -1182,7 +1172,6 @@ namespace ModularEncountersSystems.Entities {
 				CleanBlockList(Gravity);
 				CleanBlockList(Guns);
 				CleanBlockList(Gyros);
-				CleanBlockList(Inhibitors);
 				CleanBlockList(JumpDrives);
 				CleanBlockList(Mechanical);
 				CleanBlockList(Medical);
