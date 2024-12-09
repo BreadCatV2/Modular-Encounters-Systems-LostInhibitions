@@ -1743,9 +1743,9 @@ namespace ModularEncountersSystems.Behavior {
 
 				if (trigger.UseElseActions && trigger.ElseActions.Count > 0) {
 
-					sb.Append("     - ElseActions:         ").Append(trigger.Actions.Count).AppendLine();
+					sb.Append("     - ElseActions:         ").Append(trigger.ElseActions.Count).AppendLine();
 
-					foreach (var action in trigger.Actions) {
+					foreach (var action in trigger.ElseActions) {
 
 						sb.Append("       - Action:        ").Append(action.ProfileSubtypeId).AppendLine();
 						sb.Append("       - Chats:         ").Append(action.ChatData.Count).AppendLine();

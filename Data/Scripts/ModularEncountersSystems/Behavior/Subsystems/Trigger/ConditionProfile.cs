@@ -13,6 +13,7 @@ using ModularEncountersSystems.Configuration;
 using ModularEncountersSystems.Entities;
 using Sandbox.Game;
 using ModularEncountersSystems.Spawning;
+using ModularEncountersSystems.Missions;
 
 namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
@@ -270,6 +271,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 				if (ConditionReference.CustomCounters.Count == ConditionReference.CustomCountersTargets.Count) {
 
+
+
+					var selfScore = _behavior?.CurrentGrid?.Npc?.Score ?? 0;
+					var commandScore = command?.NPCScoreValue ?? 0;
+
+
 					for (int i = 0; i < ConditionReference.CustomCounters.Count; i++) {
 
 						try {
@@ -279,7 +286,31 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 							if (i <= ConditionReference.CounterCompareTypes.Count - 1)
 								compareType = ConditionReference.CounterCompareTypes[i];
 
-							if (_settings.GetCustomCounterResult(ConditionReference.CustomCounters[i], ConditionReference.CustomCountersTargets[i], compareType) == false) {
+
+							var counter = ConditionReference.CustomCounters[i];
+							var target = ConditionReference.CustomCountersTargets[i];
+
+							if (ConditionReference.CustomCountersTargetOverrideSelfScore)
+								target = selfScore;
+
+							if (ConditionReference.CustomCountersTargetOverrideCommandScore)
+								target = commandScore;
+
+
+							int? overrideScore = null;
+
+
+							if (counter.Contains("{CommandScore}"))
+							{
+								overrideScore = commandScore;
+							}
+							else if (counter.Contains("{SelfScore}"))
+							{
+								overrideScore = selfScore;
+							}
+
+
+							if (_settings.GetCustomCounterResult(counter, target, compareType, overrideScore) == false) {
 
 								BehaviorLogger.Write(ProfileSubtypeId + ": Counter Amount Condition Not Satisfied: " + ConditionReference.CustomCounters[i], BehaviorDebugEnum.Condition);
 								failedCheck = true;
@@ -290,6 +321,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 								break;
 							
 							}
+
+
+
+
 
 						} catch (Exception e) {
 
@@ -302,7 +337,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 				} else {
 
-					BehaviorLogger.Write(ProfileSubtypeId + ": Counter Names and Targets List Counts Don't Match. Check Your Condition Profile", BehaviorDebugEnum.Condition);
+					BehaviorLogger.Write(ProfileSubtypeId + $": Counter Names ({ConditionReference.CustomCounters.Count}) and Targets List ({ConditionReference.CustomCountersTargets.Count}) Counts Don't Match. Check Your Condition Profile", BehaviorDebugEnum.Condition);
 					failedCheck = true;
 
 				}
@@ -510,6 +545,55 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				}
 
 			}
+
+			if (ConditionReference.CheckGridVerticalSpeed == true)
+			{
+
+				usedConditions++;
+
+
+				if(_behavior.AutoPilot.CurrentPlanet == null)
+                {
+					BehaviorLogger.Write(ProfileSubtypeId + ": Vertical Speed satisfied", BehaviorDebugEnum.Condition);
+					satisfiedConditions++;
+				}
+                else
+                {
+					var velocity = _remoteControl.SlimBlock.CubeGrid.Physics.LinearVelocity;
+					var upDirection = _behavior.AutoPilot.CurrentPlanet.UpAtPosition(_remoteControl.GetPosition());
+
+
+					// Compute the dot product
+					double velocityProjectionMagnitude = Vector3D.Dot(velocity, upDirection);
+
+					// Compute the projected vector (optional, if you need the vector itself)
+					Vector3D velocityProjection = velocityProjectionMagnitude * upDirection;
+
+
+					float speed = (float)velocityProjection.Length();
+
+
+					if ((ConditionReference.MinGridVerticalSpeed == -1 || speed >= ConditionReference.MinGridVerticalSpeed) && (ConditionReference.MaxGridVerticalSpeed == -1 || speed <= ConditionReference.MaxGridVerticalSpeed))
+					{
+
+						BehaviorLogger.Write(ProfileSubtypeId + ": Grid Vertical Speed in range", BehaviorDebugEnum.Condition);
+						satisfiedConditions++;
+
+					}
+					else
+					{
+
+						BehaviorLogger.Write(ProfileSubtypeId + ": Grid Vertical Speed Not in range", BehaviorDebugEnum.Condition);
+
+					}
+				}
+
+
+
+
+			}
+
+
 
 			if (ConditionReference.CheckMESBlacklistedSpawnGroups) {
 
@@ -764,7 +848,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			if (ConditionReference.GravityCheck) {
 
 				usedConditions++;
-				var grav = PlanetManager.GetTotalNaturalGravity(_behavior.RemoteControl.GetPosition()).Length();
+				var grav = PlanetManager.GetTotalGravity(_behavior.RemoteControl.GetPosition());
 
 				if ((ConditionReference.MinGravity == -1000 || grav > ConditionReference.MinGravity) && (ConditionReference.MaxGravity == -1000 || grav < ConditionReference.MaxGravity)) {
 
@@ -777,6 +861,22 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				}
 
 			}
+
+
+            if (ConditionReference.IsOnDarkSide)
+            {
+				usedConditions++;
+
+				if(_behavior.AutoPilot.CurrentPlanet != null)
+                {
+					if (MyVisualScriptLogicProvider.IsOnDarkSide(_behavior.AutoPilot.CurrentPlanet.Planet, _behavior.RemoteControl.GetPosition()))
+						satisfiedConditions++;
+
+                }
+
+			}
+
+
 
 			if (ConditionReference.AltitudeCheck) {
 
@@ -834,12 +934,6 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				}
 
 			}
-
-
-
-
-
-
 
 
 			if (ConditionReference.CheckHorizonAngle) {
@@ -1170,6 +1264,16 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 					Position = _behavior.AutoPilot.Targeting.Target.GetPosition();
 				}
 
+                if (ConditionReference.CheckThreatScoreFromClosestPlayerPosition)
+                {
+					var closestplayer = PlayerManager.GetNearestPlayer(Position);
+					if(closestplayer != null)
+                    {
+						Position = closestplayer.GetPosition();
+						//MyVisualScriptLogicProvider.ShowNotificationToAll(Position.ToString(), 5000);
+                    }
+                }
+
 				var ThreatScore = SpawnConditions.GetThreatLevel(ConditionReference.CheckThreatScoreRadius, ConditionReference.CheckThreatScoreIncludeOtherNpcOwners, Position, ConditionReference.CheckThreatScoreGridConfiguration, _behavior.RemoteControl.GetOwnerFactionTag());
 
 				if (ThreatScore < (float)ConditionReference.CheckThreatScoreMinimum && (float)ConditionReference.CheckThreatScoreMinimum > 0 && ThreatScore > (float)ConditionReference.CheckThreatScoreMaximum && (float)ConditionReference.CheckThreatScoreMaximum > 0)
@@ -1185,14 +1289,14 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				Vector3D Position = _behavior.CurrentGrid.GetPosition();
 
 				if (ConditionReference.CompareThreatScoreUseSelfValue)
-                {
+				{
 					ThreatScoreCompare = _behavior.CurrentGrid.ThreatScore * ConditionReference.CompareThreatScoreSelfValueMultiplier;
 				}
 
-                if (ConditionReference.CompareThreatScoreFromTargetPosition && _behavior.AutoPilot.Targeting.HasTarget())
-                {
+				if (ConditionReference.CompareThreatScoreFromTargetPosition && _behavior.AutoPilot.Targeting.HasTarget())
+				{
 					Position = _behavior.AutoPilot.Targeting.Target.GetPosition();
-                }
+				}
 
 				var ThreatScore = SpawnConditions.GetThreatLevel(ConditionReference.CompareThreatScoreRadius, ConditionReference.CompareThreatScoreIncludeOtherNpcOwners, Position, ConditionReference.CompareThreatScoreGridConfiguration, _behavior.RemoteControl.GetOwnerFactionTag());
 
@@ -1271,6 +1375,28 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			
 			}
 
+            if (ConditionReference.NoActiveContracts)
+            {
+				usedConditions++;
+				bool fail = false;
+				foreach (var block in _behavior.CurrentGrid.Contracts)
+				{
+					if (InGameContractManager.HasContractBlockActiveContract(block.Entity.EntityId))
+					{
+						fail = true;
+						break;
+
+					}
+
+				}
+
+                if (!fail)
+                {
+					satisfiedConditions++;
+				}
+			}
+
+
 			if (ConditionReference.CheckForSpawnConditions) {
 
 				usedConditions++;
@@ -1293,6 +1419,26 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			}
 
+            if (ConditionReference.CheckIfSpawnGroupExist)
+            {
+				usedConditions++;
+				var spawngroupname = IdsReplacer.ReplaceId(_behavior?.CurrentGrid?.Npc ?? null, ConditionReference.ExistingSpawnGroupName);
+
+				if (SpawnGroupManager.SpawnGroupNames.Contains(spawngroupname))
+                {
+					//MyVisualScriptLogicProvider.ShowNotificationToAll(spawngroupname, 5000, "Green");
+					satisfiedConditions++;
+				}
+                else
+                {
+					//MyVisualScriptLogicProvider.ShowNotificationToAll(spawngroupname, 5000, "Red");
+				}
+					
+
+
+
+            }
+
 			if (ConditionReference.CheckForPlanetaryLane) {
 
 				usedConditions++;
@@ -1310,8 +1456,9 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				if (_behavior.AutoPilot.InGravity()) {
 
 					//MyVisualScriptLogicProvider.ShowNotificationToAll("Max Grav For Thrust: " + _behavior.AutoPilot.CalculateMaxGravity().ToString(), 6000);
+					//MyVisualScriptLogicProvider.ShowNotificationToAll("Grav For Thrust: " + PlanetManager.GetTotalGravity(_behavior.RemoteControl.GetPosition()).ToString(), 6000);
 
-					if(_behavior.AutoPilot.CalculateMaxGravity() > PlanetManager.GetTotalNaturalGravity(_behavior.RemoteControl.GetPosition()).Length())
+					if(_behavior.AutoPilot.CalculateMaxGravity() > PlanetManager.GetTotalGravity(_behavior.RemoteControl.GetPosition()))
 						satisfiedConditions++;
 
 				} else {

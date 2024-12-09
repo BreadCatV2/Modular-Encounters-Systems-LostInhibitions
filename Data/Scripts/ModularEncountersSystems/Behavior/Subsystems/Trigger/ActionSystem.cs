@@ -5,6 +5,7 @@ using ModularEncountersSystems.Entities;
 using ModularEncountersSystems.Events.Action;
 using ModularEncountersSystems.Helpers;
 using ModularEncountersSystems.Logging;
+using ModularEncountersSystems.Missions;
 using ModularEncountersSystems.Spawning;
 using ModularEncountersSystems.Spawning.Manipulation;
 using ModularEncountersSystems.Spawning.Profiles;
@@ -67,12 +68,15 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			LocalApi.BehaviorTriggerWatcher?.Invoke(RemoteControl, trigger.ProfileSubtypeId, actions.ProfileSubtypeId, _behavior.AutoPilot.Targeting.Target?.GetEntity(), _behavior.AutoPilot.GetCurrentWaypoint());
 
-			BehaviorLogger.Write(actions.ProfileSubtypeId + ": Performing Eligible Actions", BehaviorDebugEnum.Action);
+			BehaviorLogger.Write($"{actions.ProfileSubtypeId}: Performing Eligible Actions: AEI[{attackerEntityId}], DE[{detectedEntity}]", BehaviorDebugEnum.Action);
 
 			//Debug Message
 			if (!string.IsNullOrWhiteSpace(actions.DebugMessage)) {
 
-				MyVisualScriptLogicProvider.ShowNotificationToAll(actions.DebugMessage, 4000);
+				MyVisualScriptLogicProvider.SendChatMessage(actions.DebugMessage, RemoteControl.SlimBlock.CubeGrid.CustomName);
+
+
+				//MyVisualScriptLogicProvider.ShowNotificationToAll(actions.DebugMessage, 4000);
 			
 			}
 
@@ -92,13 +96,13 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			//Playsound cue
 
 			if (actions.PlayDialogueCue)
-            {
+			{
 				bool foundDialogueCueId =false;
 
 				ChatProfile chat = null;
 
 				foreach (var dialogueBank in _dialogueBanks)
-                {
+				{
 				
 					if(dialogueBank.GetChatProfile(actions.DialogueCueId,ref chat))
 					{
@@ -109,7 +113,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 					
 				}
-            }
+			}
 
 
 			//PlaySoundAtPosition
@@ -188,6 +192,9 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 							//BehaviorLogger.AddMsg("Do Spawn", true);
 							spawner.AssignInitialMatrix(RemoteControl.WorldMatrix);
 							spawner.CurrentFactionTag = spawner.ForceSameFactionOwnership && !string.IsNullOrWhiteSpace(_owner.Faction?.Tag) ? _owner.Faction.Tag : "";
+
+							spawner.SpawnGroups = IdsReplacer.ReplaceIds(_behavior?.CurrentGrid?.Npc ?? null, spawner.SpawnGroups);
+
 							BehaviorSpawnHelper.BehaviorSpawnRequest(spawner);
 
 						}
@@ -197,9 +204,6 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				}
 
 			} else {
-
-
-
 			}
 
 			//SelfDestruct
@@ -260,7 +264,11 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			//ForceDespawn
 			if (actions.ForceDespawn) {
 
-				_despawn.DespawnGrid();
+
+				if (actions.TryToDespawnThisGridOnly)
+					_despawn.DespawnThisGrid();
+				else
+					_despawn.DespawnGrid();
 
 			}
 
@@ -294,6 +302,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 					var newCommand = new Command();
 					newCommand.PrepareCommand(_behavior, commandProfile, actions, command, attackerEntityId, detectedEntity);
 					BehaviorLogger.Write(actions.ProfileSubtypeId + ": Sending Command: " + newCommand.CommandCode, BehaviorDebugEnum.Action);
+					BehaviorLogger.Write(actions.ProfileSubtypeId + ": Sending Command: " + newCommand.CommandCode, BehaviorDebugEnum.Command);
 					CommandHelper.SendCommand(newCommand);
 
 				}
@@ -665,16 +674,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 					}
 				}
-
-
-
-			
 			}
-
-
-
-
-
 
 
 			//ChangeNpcFactionCredits
@@ -754,6 +754,13 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			}
 
+			//ChangeAttackersFactionAccount
+			if (actions.ChangeAttackersFactionAccount == true){
+
+				BehaviorLogger.Write(actions.ProfileSubtypeId + ": Attempting FactionAccount Change for Attacker", BehaviorDebugEnum.Action);
+				FactionHelper.ChangeFactionAccountByAmount(RemoteControl, actions.ChangeAttackersFactionAccountByAmount, _settings.LastDamagerEntity);
+
+			}
 
 			//TriggerTimerBlock
 			if (actions.TriggerTimerBlocks == true) {
@@ -803,6 +810,25 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				OwnershipHelper.ChangeAntennaBlockOwnership(AntennaList, actions.AntennaFactionOwner);
 
 			}
+
+			if (actions.ChangeAntennaHudText == true)
+			{
+
+				BehaviorLogger.Write(actions.ProfileSubtypeId + ": Attempting Antenna Namechange Change Block Count: " + AntennaList.Count, BehaviorDebugEnum.Action);
+
+
+				foreach (var antenna in AntennaList)
+				{
+
+					if (antenna == null)
+						continue;
+
+					antenna.HudText = actions.AntennaHudText;
+
+				}
+
+			}
+
 
 			//CreateKnownPlayerArea
 			if (actions.CreateKnownPlayerArea == true) {
@@ -880,8 +906,8 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 					if (actions.ManuallyActivatedTriggerNames.Contains(manualTrigger.ProfileSubtypeId))
 						ProcessManualTrigger(manualTrigger, actions.ForceManualTriggerActivation);
 
-                    foreach (var tag in manualTrigger.Tags)
-                    {
+					foreach (var tag in manualTrigger.Tags)
+					{
 						if (actions.ManuallyActivatedTriggerTags.Contains(tag))
 							ProcessManualTrigger(manualTrigger, actions.ForceManualTriggerActivation);
 
@@ -977,6 +1003,48 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 				_behavior.Grid.BuildProjectedBlocks(actions.MaxProjectedBlocksToBuild);
 
+			}
+
+			//RepairBlocks
+			if (actions.RepairBlocks)
+			{
+				if (!actions.RepairBlocksIncludeSubgrids) {
+
+					_behavior.Grid.BuildProjectedBlocks(actions.MaxProjectedBlocksToBuild);
+
+				} 
+				else 
+				{
+
+					int remainingBlocks = actions.MaxProjectedBlocksToBuild;
+
+					if (_behavior?.CurrentGrid != null)
+					{
+
+						lock (_behavior.CurrentGrid.LinkedGrids)
+						{
+
+							for (int i = _behavior.CurrentGrid.LinkedGrids.Count - 1; i >= 0; i--)
+							{
+
+								var grid = GridManager.GetSafeGridFromIndex(i, _behavior.CurrentGrid.LinkedGrids);
+
+								if (grid == null || !grid.ActiveEntity())
+									continue;
+
+								remainingBlocks -= grid.AutoRepairBlocks(false, remainingBlocks);
+
+								if (remainingBlocks <= 0)
+									break;
+
+							}
+
+						}
+
+					}
+
+				}
+				
 			}
 
 			//ChangeBlockOwnership
@@ -1360,6 +1428,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			if (actions.ActivateEvent)
 			{
+				var _ActivateEventTags = IdsReplacer.ReplaceIds(_behavior?.CurrentGrid?.Npc ?? null, actions.ActivateEventTags);
+				var _ActivateEventIds = IdsReplacer.ReplaceIds(_behavior?.CurrentGrid?.Npc ?? null, actions.ActivateEventIds);
+
+
 				//Something doesn't feel right here - CPT
 				for (int i = 0; i < Events.EventManager.EventsList.Count; i++)
 				{
@@ -1370,9 +1442,9 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 						continue;
 					}
 
-					for (int j = 0; j < actions.ActivateEventTags.Count; j++)
+					for (int j = 0; j < _ActivateEventTags.Count; j++)
 					{
-						var thisEventTag = actions.ActivateEventTags[j];
+						var thisEventTag = _ActivateEventTags[j];
 
 						if (thisEvent.Profile.Tags.Contains(thisEventTag))
 						{
@@ -1382,24 +1454,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 					}
 
 
-					for (int j = 0; j < actions.ActivateEventIds.Count; j++)
+					for (int j = 0; j < _ActivateEventIds.Count; j++)
 					{
-						var thisEventId = actions.ActivateEventIds[j];
+						var thisEventId = _ActivateEventIds[j];
 
 						var SpawnGroupName = _behavior?.CurrentGrid?.Npc.SpawnGroupName;
 						var Faction = _behavior?.CurrentGrid?.Npc.InitialFaction;
-
-						if (thisEventId.Contains("{SpawnGroupName}") && SpawnGroupName != null)
-						{
-							thisEventId = thisEventId.Replace("{SpawnGroupName}", SpawnGroupName);
-						}
-
-
-						if (thisEventId.Contains("{Faction}") && Faction != null)
-						{
-							thisEventId = thisEventId.Replace("{Faction}", Faction);
-						}
-
 
 						if (thisEvent.ProfileSubtypeId == thisEventId)
 						{
@@ -1465,6 +1525,51 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				}
 			
 			}
+
+			if (actions.ApplyContractProfiles && (_behavior.CurrentGrid?.ActiveEntity() ?? false))
+			{
+
+				BehaviorLogger.Write(actions.ProfileSubtypeId + ": Applying contract Profiles.", BehaviorDebugEnum.Action);
+				//BehaviorLogger.Write(string.Format("Store Blocks / Store Profiles ::: {0} / {1}", actions.ContractBlocks.Count, actions.ContractBlocks.Count), BehaviorDebugEnum.Action);
+				for (int i = 0; i < actions.ContractBlockProfiles.Count && i < actions.ContractBlocks.Count; i++)
+				{
+
+					if (string.IsNullOrWhiteSpace(actions.ContractBlockProfiles[i]) || string.IsNullOrWhiteSpace(actions.ContractBlocks[i]))
+						continue;
+
+					ContractBlockProfile profile = null;
+
+					if (!ProfileManager.ContractBlockProfiles.TryGetValue(actions.ContractBlockProfiles[i], out profile))
+					{
+
+						BehaviorLogger.Write(actions.ProfileSubtypeId + ": Couldn't find Mission Profile With Name: " + actions.ContractBlockProfiles[i], BehaviorDebugEnum.Action);
+						continue;
+
+					}
+
+					foreach (var contractblock in _behavior.CurrentGrid.Contracts)
+					{
+
+						if (!contractblock.ActiveEntity() || contractblock.Block.CustomName != actions.ContractBlocks[i]) //|| contractblock.Block.OwnerId != _behavior.RemoteControl.OwnerId
+							continue;
+
+						BehaviorLogger.Write(actions.ProfileSubtypeId + ": Applying Contract Profile With Name: " + actions.ContractBlocks[i], BehaviorDebugEnum.Action);
+						profile.ApplyProfileToBlock(contractblock, _behavior?.CurrentGrid?.Npc.SpawnGroupName ?? "", actions.ClearContractContentsFirst);
+
+
+
+					}
+
+				}
+
+			}
+
+
+
+
+
+
+
 
 			if (actions.UseCurrentPositionAsPatrolReference) {
 
@@ -1547,8 +1652,8 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 						if ((command?.PlayerIdentity ?? 0)  != 0 && (command?.PlayerIdentity ?? 0) == player.Player.IdentityId)
 							SavedPlayerIdentityAlreadyIncluded = true;
 
-                        foreach (var addtag in actions.AddTags)
-                        {
+						foreach (var addtag in actions.AddTags)
+						{
 							var tag = IdsReplacer.ReplaceId(_behavior?.CurrentGrid?.Npc?? null, addtag);
 
 							if (player.ProgressionData.Tags.Contains(tag))
@@ -1561,12 +1666,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				}
 
 				if (actions.AddTagsIncludeSavedPlayerIdentity && !SavedPlayerIdentityAlreadyIncluded && command != null)
-                {
+				{
 					var playerid = command?.PlayerIdentity ?? 0;
 					var player = PlayerManager.GetPlayerWithIdentityId(playerid);
 
 					if(player != null)
-                    {
+					{
 						foreach (var addtag in actions.AddTags)
 						{
 							var tag = IdsReplacer.ReplaceId(_behavior?.CurrentGrid?.Npc ?? null, addtag);
@@ -1612,7 +1717,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 					var player = PlayerManager.GetPlayerWithIdentityId(playerid);
 
 					if (player != null)
-                    {
+					{
 						foreach (var removetag in actions.RemoveTags)
 						{
 							var tag = IdsReplacer.ReplaceId(_behavior?.CurrentGrid?.Npc ?? null, removetag);
@@ -1651,6 +1756,15 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			}
 
+
+            if (actions.SaveLocationToSandboxVariable)
+            {
+				MyAPIGateway.Utilities.SetVariable(IdsReplacer.ReplaceId(_behavior?.CurrentGrid?.Npc ?? null, actions.LocationSandboxVariableName), RemoteControl.GetPosition());
+			}
+
+
+
+
 			//SetBooleansTrue
 			foreach (var variable in actions.SetBooleansTrue)
 				_settings.SetCustomBool(variable, true);
@@ -1659,17 +1773,27 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			foreach (var variable in actions.SetBooleansFalse)
 				_settings.SetCustomBool(variable, false);
 
-			//IncreaseCounters
-			foreach (var variable in actions.IncreaseCounters)
-				_settings.SetCustomCounter(variable, 1);
 
-			//DecreaseCounters
+
+			// IncreaseCounters
+			int increaseAmount = actions.IncreaseCountersUseCommandScore && command != null ? command.NPCScoreValue : Math.Abs(actions.IncreaseCountersAmount);
+			foreach (var variable in actions.IncreaseCounters)
+			{
+				_settings.SetCustomCounter(variable, increaseAmount);
+			}
+
+			// DecreaseCounters
+			int decreaseAmount = actions.DecreaseCountersUseCommandScore && command != null ? -command.NPCScoreValue : -Math.Abs(actions.DecreaseCountersAmount);
 			foreach (var variable in actions.DecreaseCounters)
-				_settings.SetCustomCounter(variable, -1);
+			{
+				_settings.SetCustomCounter(variable, decreaseAmount);
+			}
+
+
 
 			//ResetCounters
 			foreach (var variable in actions.ResetCounters)
-				_settings.SetCustomCounter(variable, 0, true);
+			_settings.SetCustomCounter(variable, 0, true);
 
 			//SetCounters
 			if (actions.SetCounters.Count == actions.SetCountersValues.Count) {

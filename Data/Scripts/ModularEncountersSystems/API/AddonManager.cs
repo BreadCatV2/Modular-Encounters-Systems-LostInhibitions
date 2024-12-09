@@ -56,11 +56,12 @@ namespace ModularEncountersSystems.API {
 		//Water Mod
 		public static bool WaterMod = false;
 		private static ulong _waterModSteamId = 2200451495;
+		private static ulong _waterModSteamIdDYG = 3283226082;
 		private static ulong _waterModModIoId = 2148454;
 
 		//Nebula Mod
 		public static bool NebulaMod = false;
-		private static ulong _nebulaModSteamId = 2200451495;
+		private static ulong _nebulaModSteamId = 2367570463; //API is an outdated version. Could be fixed, I think... -Cpt
 
 		//Defense Shields
 		public static bool DefenseShields = false;
@@ -185,7 +186,7 @@ namespace ModularEncountersSystems.API {
 				}
 
 				//Water Mod
-				if (id == _waterModSteamId || id == _waterModModIoId) {
+				if (id == _waterModSteamId || id  == _waterModSteamIdDYG || id == _waterModModIoId) {
 
 					SpawnLogger.Write("Water Mod Detected", SpawnerDebugEnum.Startup);
 					WaterMod = true;
@@ -197,7 +198,7 @@ namespace ModularEncountersSystems.API {
 				if (id == _nebulaModSteamId) {
 
 					SpawnLogger.Write("Nebula Mod Detected", SpawnerDebugEnum.Startup);
-					NebulaMod = true;
+					//NebulaMod = true;
 					continue;
 
 				}

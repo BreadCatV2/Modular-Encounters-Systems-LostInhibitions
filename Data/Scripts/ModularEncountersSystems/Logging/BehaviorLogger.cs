@@ -1,8 +1,12 @@
-﻿using Sandbox.ModAPI;
+﻿using ModularEncountersSystems.Core;
+using ModularEncountersSystems.Entities;
+using Sandbox.Game;
+using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VRage.Game.ModAPI;
 using VRage.Utils;
 
 namespace ModularEncountersSystems.Logging {
@@ -151,7 +155,22 @@ namespace ModularEncountersSystems.Logging {
 				WriteToBuilder(msg, type, Dev, forceGameLog);
 
 			if (type == BehaviorDebugEnum.Error)
+            {
 				WriteToBuilder(msg, type, Error, forceGameLog);
+
+                if (MES_SessionCore.DeveloperMode)
+                {
+					foreach (var player in PlayerManager.ActivePlayers)
+					{
+						if (player.PromoteLevel == MyPromoteLevel.Admin || player.PromoteLevel == MyPromoteLevel.Owner)
+						{
+							MyVisualScriptLogicProvider.SendChatMessageColored("Exception in Main Behavior Processing, please provide /MES.Info.GetDiagnostics in the MES discord server.", VRageMath.Color.Red, "MES", player.IdentityId);
+						}
+					}
+				}
+
+			}
+
 
 			if (type == BehaviorDebugEnum.General)
 				WriteToBuilder(msg, type, General, forceGameLog);

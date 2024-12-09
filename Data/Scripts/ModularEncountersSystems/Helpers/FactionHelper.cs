@@ -254,6 +254,24 @@ namespace ModularEncountersSystems.Helpers {
 
 		}
 
+
+
+
+		public static void ChangePlayerReputationWithFactions(IMyRemoteControl remoteControl, int amount, List<long> players, string factionTag, bool applyReputationChangeToFactionMembers, int minRep, int maxRep)
+		{
+
+			var amounts = new List<int>();
+			amounts.Add(amount);
+
+			var factionTags = new List<string>();
+			factionTags.Add(factionTag);
+
+
+			ChangePlayerReputationWithFactions(remoteControl, amounts, players, factionTags, applyReputationChangeToFactionMembers, minRep, maxRep);
+		}
+
+
+
 		public static void ChangePlayerReputationWithFactions(IMyRemoteControl remoteControl, List<int> amounts, List<long> players, List<string> factionTags, bool applyReputationChangeToFactionMembers, int minRep, int maxRep) {
 
 			var allPlayerIds = new List<long>(players.ToList());
@@ -335,6 +353,44 @@ namespace ModularEncountersSystems.Helpers {
 
 						//BehaviorLogger.Write("Send Rep Sync Message", BehaviorDebugEnum.Owner);
 						var message = new ReputationMessage(amount, tag, steamId);
+						var syncContainer = new SyncContainer(message);
+						SyncManager.SendSyncMesage(syncContainer, steamId);
+
+					}
+
+				}
+
+			}
+
+		}
+
+		public static void ChangeFactionAccountByAmount(IMyRemoteControl remoteControl, int changeAmount, long attackingEntity){ 
+
+			//Get the players Id
+			var owner = DamageHelper.GetAttackOwnerId(attackingEntity);
+
+			if (owner == 0) {
+
+				BehaviorLogger.Write("No Owner From Provided Id: " + attackingEntity, BehaviorDebugEnum.Action);
+				return;
+
+			}
+
+			var ownerFaction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(owner);
+			if (ownerFaction != null) {
+
+				//Change the balance
+				BehaviorLogger.Write($"Requesting balance change of[{changeAmount}] for [{ownerFaction.Tag}] ID[{attackingEntity}]", BehaviorDebugEnum.Action);
+				ownerFaction.RequestChangeBalance(changeAmount);
+
+				//Notify the players
+				foreach(long playerId in ownerFaction.Members.Keys){ 
+
+					var steamId = MyAPIGateway.Players.TryGetSteamId(playerId);
+					if (steamId > 0) {
+
+						//Notify the player.
+						var message = new BalanceChangeMessage(steamId, ownerFaction.Name, changeAmount);
 						var syncContainer = new SyncContainer(message);
 						SyncManager.SendSyncMesage(syncContainer, steamId);
 

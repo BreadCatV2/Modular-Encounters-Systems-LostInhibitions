@@ -60,6 +60,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool ChangeAntennaOwnership;
 		public string AntennaFactionOwner;
 
+		public bool ChangeAntennaHudText;
+		public string AntennaHudText;
+
+
 		public bool CreateKnownPlayerArea;
 		public double KnownPlayerAreaRadius;
 		public int KnownPlayerAreaTimer;
@@ -80,6 +84,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public List<string> SetBooleansTrue;
 		public List<string> SetBooleansFalse;
 		public List<string> IncreaseCounters;
+		public int IncreaseCountersAmount;
+		public int DecreaseCountersAmount;
+		public bool IncreaseCountersUseCommandScore;
+		public bool DecreaseCountersUseCommandScore;
+
+
 		public List<string> DecreaseCounters;
 		public List<string> ResetCounters;
 
@@ -88,7 +98,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public List<string> IncreaseSandboxCounters;
 		public List<string> DecreaseSandboxCounters;
 		public int IncreaseSandboxCountersAmount;      
-		public int DecreaseSandboxCountersAmount;      
+		public int DecreaseSandboxCountersAmount;
 
 		public List<string> ResetSandboxCounters;
 
@@ -100,6 +110,9 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool ReputationChangesForAllAttackPlayerFactionMembers;
 		public int ReputationMinCap;
 		public int ReputationMaxCap;
+
+		public bool ChangeAttackersFactionAccount;
+		public int ChangeAttackersFactionAccountByAmount;
 
 		public string ProfileSubtypeId;
 
@@ -132,6 +145,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public float AntennaRangeChangeAmount;
 
 		public bool ForceDespawn;
+		public bool TryToDespawnThisGridOnly;
 
 		public bool ResetCooldownTimeOfTriggers;
 		public List<string> ResetTriggerCooldownNames;
@@ -240,6 +254,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 		public bool BuildProjectedBlocks;
 		public int MaxProjectedBlocksToBuild;
+
+		public bool RepairBlocks;
+		public int MaxBlocksToRepair;
+		public bool RepairBlocksIncludeSubgrids;
 
 		public bool ForceManualTriggerActivation;
 
@@ -374,6 +392,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public List<string> StoreBlocks;
 		public List<string> StoreProfiles;
 
+		public bool ApplyContractProfiles;
+		public bool ClearContractContentsFirst;
+		public List<string> ContractBlocks;
+		public List<string> ContractBlockProfiles;
+
+
 		public bool ActivateEvent;
 		public List<string> ActivateEventIds;
 		public List<string> ActivateEventTags;
@@ -426,6 +450,11 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool ChangeBlocksShareModeAll;
 		public List<string> BlockNamesShareModeAll;
 
+		public bool SaveLocationToSandboxVariable;
+		public string LocationSandboxVariableName;
+
+
+
 		public Dictionary<string, Action<string, object>> EditorReference;
 
 
@@ -445,6 +474,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			StaggerWarheadDetonation = false;
 
 			Retreat = false;
+
+			ChangeAntennaHudText = false;
+			AntennaHudText = "";
+
+
+
 
 			BroadcastCurrentTarget = false;
 			BroadcastDamagerTarget = false;
@@ -470,13 +505,15 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			ReputationChangesForAllRadiusPlayerFactionMembers = false;
 			ReputationPlayerConditionIds = new List<string>();
 
-
 			ChangeAttackerReputation = false;
 			ChangeAttackerReputationFaction = new List<string>();
 			ChangeAttackerReputationAmount = new List<int>();
 			ReputationChangesForAllAttackPlayerFactionMembers = false;
 			ReputationMinCap = -1500;
 			ReputationMaxCap = 1500;
+
+			ChangeAttackersFactionAccount = false;
+			ChangeAttackersFactionAccountByAmount = 0;
 
 			ActivateAssertiveAntennas = false;
 
@@ -518,8 +555,14 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			
 			IncreaseSandboxCountersAmount = 1;
+
 			DecreaseSandboxCountersAmount = -1;
 
+			IncreaseCountersAmount = 1;
+			DecreaseCountersAmount = -1;
+
+			IncreaseCountersUseCommandScore = false;
+			DecreaseCountersUseCommandScore = false;
 
 			BroadcastGenericCommand = false;
 
@@ -547,6 +590,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			AntennaRangeChangeAmount = 0;
 
 			ForceDespawn = false;
+			TryToDespawnThisGridOnly = false;
 
 			ResetCooldownTimeOfTriggers = false;
 			ResetTriggerCooldownNames = new List<string>();
@@ -653,6 +697,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			BuildProjectedBlocks = false;
 			MaxProjectedBlocksToBuild = -1;
+
+			RepairBlocks = false;
+			MaxBlocksToRepair = -1;
+			RepairBlocksIncludeSubgrids = false;
 
 			ForceManualTriggerActivation = false;
 
@@ -781,6 +829,14 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			StoreBlocks = new List<string>();
 			StoreProfiles = new List<string>();
 
+
+			ApplyContractProfiles = false;
+			ClearContractContentsFirst = true;
+			ContractBlocks = new List<string>();
+			ContractBlockProfiles = new List<string>();
+
+
+
 			ActivateEvent = false;
 			ActivateEventIds = new List<string>();
 			ActivateEventTags = new List<string>();
@@ -835,8 +891,13 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			BlockNamesShareModeAll = new List<string>();
 
 			ResetThisStaticEncounter = false;
+			SaveLocationToSandboxVariable = false;
 
-			EditorReference = new Dictionary<string, Action<string, object>> {
+			LocationSandboxVariableName = "";
+
+
+
+		EditorReference = new Dictionary<string, Action<string, object>> {
 
 				{"UseChatBroadcast", (s, o) => TagParse.TagBoolCheck(s, ref UseChatBroadcast) },
 				{"BarrelRoll", (s, o) => TagParse.TagBoolCheck(s, ref BarrelRoll) },
@@ -867,10 +928,14 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"ReputationChangeFactions", (s, o) => TagParse.TagStringListCheck(s, ref ReputationChangeFactions) },
 				{"ReputationPlayerConditionIds", (s, o) => TagParse.TagStringListCheck(s, ref ReputationPlayerConditionIds) },
 				{"ReputationChangeAmount", (s, o) => TagParse.TagIntListCheck(s, ref ReputationChangeAmount) },
+				{"ChangeAttackersFactionAccount", (s, o) => TagParse.TagBoolCheck(s, ref ChangeAttackersFactionAccount) },
+				{"ChangeAttackersFactionAccountByAmount", (s, o) => TagParse.TagIntCheck(s, ref ChangeAttackersFactionAccountByAmount) },
 				{"ActivateAssertiveAntennas", (s, o) => TagParse.TagBoolCheck(s, ref ActivateAssertiveAntennas) },
 				{"ChangeAntennaOwnership", (s, o) => TagParse.TagBoolCheck(s, ref ChangeAntennaOwnership) },
 				{"AntennaFactionOwner", (s, o) => TagParse.TagStringCheck(s, ref AntennaFactionOwner) },
-				{"CreateKnownPlayerArea", (s, o) => TagParse.TagBoolCheck(s, ref CreateKnownPlayerArea) },
+				{"ChangeAntennaHudText", (s, o) => TagParse.TagBoolCheck(s, ref ChangeAntennaHudText) },
+				{"AntennaHudText", (s, o) => TagParse.TagStringCheck(s, ref AntennaHudText) },
+				{ "CreateKnownPlayerArea", (s, o) => TagParse.TagBoolCheck(s, ref CreateKnownPlayerArea) },
 				{"KnownPlayerAreaRadius", (s, o) => TagParse.TagDoubleCheck(s, ref KnownPlayerAreaRadius) },
 				{"KnownPlayerAreaTimer", (s, o) => TagParse.TagIntOrDayCheck(s, ref KnownPlayerAreaTimer) },
 				{"KnownPlayerAreaMaxSpawns", (s, o) => TagParse.TagIntCheck(s, ref KnownPlayerAreaMaxSpawns) },
@@ -895,7 +960,13 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"IncreaseSandboxCounters", (s, o) => TagParse.TagStringListCheck(s, ref IncreaseSandboxCounters) },
 				{"DecreaseSandboxCounters", (s, o) => TagParse.TagStringListCheck(s, ref DecreaseSandboxCounters) },
 				{"IncreaseSandboxCountersAmount", (s, o) => TagParse.TagIntCheck(s, ref IncreaseSandboxCountersAmount) }, 
-				{"DecreaseSandboxCountersAmount", (s, o) => TagParse.TagIntCheck(s, ref DecreaseSandboxCountersAmount) }, 
+				{"DecreaseSandboxCountersAmount", (s, o) => TagParse.TagIntCheck(s, ref DecreaseSandboxCountersAmount) },
+				{"IncreaseCountersAmount", (s, o) => TagParse.TagIntCheck(s, ref IncreaseCountersAmount) },
+				{"DecreaseCountersAmount", (s, o) => TagParse.TagIntCheck(s, ref DecreaseCountersAmount) },
+				{"IncreaseCountersUseCommandScore", (s, o) => TagParse.TagBoolCheck(s, ref IncreaseCountersUseCommandScore) },
+				{"DecreaseCountersUseCommandScore", (s, o) => TagParse.TagBoolCheck(s, ref DecreaseCountersUseCommandScore) },
+
+
 				{"ResetSandboxCounters", (s, o) => TagParse.TagStringListCheck(s, ref ResetSandboxCounters) },
 				{"ChangeAttackerReputation", (s, o) => TagParse.TagBoolCheck(s, ref ChangeAttackerReputation) },
 				{"ChangeAttackerReputationFaction", (s, o) => TagParse.TagStringListCheck(s, ref ChangeAttackerReputationFaction) },
@@ -911,6 +982,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"AntennaRangeChangeType", (s, o) => TagParse.TagStringCheck(s, ref AntennaRangeChangeType) },
 				{"AntennaRangeChangeAmount", (s, o) => TagParse.TagFloatCheck(s, ref AntennaRangeChangeAmount) },
 				{"ForceDespawn", (s, o) => TagParse.TagBoolCheck(s, ref ForceDespawn) },
+				{"TryToDespawnThisGridOnly", (s, o) => TagParse.TagBoolCheck(s, ref TryToDespawnThisGridOnly) },
 				{"ResetCooldownTimeOfTriggers", (s, o) => TagParse.TagBoolCheck(s, ref ResetCooldownTimeOfTriggers) },
 				{"ResetTriggerCooldownNames", (s, o) => TagParse.TagStringListCheck(s, ref ResetTriggerCooldownNames) },
 				{"ResetTriggerCooldownTags", (s, o) => TagParse.TagStringListCheck(s, ref ResetTriggerCooldownTags) },
@@ -989,6 +1061,9 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"ChangeNpcFactionCreditsAmount", (s, o) => TagParse.TagLongCheck(s, ref ChangeNpcFactionCreditsAmount) },
 				{"ChangeNpcFactionCreditsTag", (s, o) => TagParse.TagStringCheck(s, ref ChangeNpcFactionCreditsTag) },
 				{"BuildProjectedBlocks", (s, o) => TagParse.TagBoolCheck(s, ref BuildProjectedBlocks) },
+				{"RepairBlocks", (s, o) => TagParse.TagBoolCheck(s, ref RepairBlocks) },
+				{"MaxBlocksToRepair", (s, o) => TagParse.TagIntCheck(s, ref MaxBlocksToRepair) },
+				{"RepairBlocksIncludeSubgrids", (s, o) => TagParse.TagBoolCheck(s, ref RepairBlocksIncludeSubgrids) },
 				{"MaxProjectedBlocksToBuild", (s, o) => TagParse.TagIntCheck(s, ref MaxProjectedBlocksToBuild) },
 				{"ForceManualTriggerActivation", (s, o) => TagParse.TagBoolCheck(s, ref ForceManualTriggerActivation) },
 				{"OverwriteAutopilotProfile", (s, o) => TagParse.TagBoolCheck(s, ref OverwriteAutopilotProfile) },
@@ -1092,6 +1167,11 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"StoreBlocks", (s, o) => TagParse.TagStringListCheck(s, ref StoreBlocks) },
 				{"StoreProfiles", (s, o) => TagParse.TagStringListCheck(s, ref StoreProfiles) },
 
+				{"ApplyContractProfiles", (s, o) => TagParse.TagBoolCheck(s, ref ApplyContractProfiles) },
+				{"ClearContractContentsFirst", (s, o) => TagParse.TagBoolCheck(s, ref ClearContractContentsFirst) },
+				{"ContractBlocks", (s, o) => TagParse.TagStringListCheck(s, ref ContractBlocks) },
+				{"ContractBlockProfiles", (s, o) => TagParse.TagStringListCheck(s, ref ContractBlockProfiles) },
+				{"ContractProfiles", (s, o) => TagParse.TagStringListCheck(s, ref ContractBlockProfiles) },
 				{"ActivateEvent", (s, o) => TagParse.TagBoolCheck(s, ref ActivateEvent) },
 				{"ActivateEventIds", (s, o) => TagParse.TagStringListCheck(s, ref ActivateEventIds) },
 				{"ActivateEventTags", (s, o) => TagParse.TagStringListCheck(s, ref ActivateEventTags) },
@@ -1144,7 +1224,11 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"ChangeBlocksShareModeAll", (s, o) => TagParse.TagBoolCheck(s, ref ChangeBlocksShareModeAll) },
 				{"BlockNamesShareModeAll", (s, o) => TagParse.TagStringListCheck(s, ref BlockNamesShareModeAll) },
 
-			};
+				{"SaveLocationToSandboxVariable", (s, o) => TagParse.TagBoolCheck(s, ref SaveLocationToSandboxVariable) },
+				{"LocationSandboxVariableName", (s, o) => TagParse.TagStringCheck(s, ref LocationSandboxVariableName) },
+
+
+				};
 
 		}
 

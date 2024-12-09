@@ -38,11 +38,20 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool CheckCustomCounters;
 		public List<string> CustomCounters;
 		public List<int> CustomCountersTargets;
+		public bool CustomCountersTargetOverrideSelfScore;
+		public bool CustomCountersTargetOverrideCommandScore;
+
+
 		public bool AllowAnyValidCounter;
 
 		public bool CheckGridSpeed;
 		public float MinGridSpeed;
 		public float MaxGridSpeed;
+
+		public bool CheckGridVerticalSpeed;
+		public float MinGridVerticalSpeed;
+		public float MaxGridVerticalSpeed;
+
 
 		public bool CheckMESBlacklistedSpawnGroups;
 
@@ -123,6 +132,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public double MinAltitude;
 		public double MaxAltitude;
 
+		public bool IsOnDarkSide;
+
+
+
 		public bool TargetAltitudeCheck;
 		public double MinTargetAltitude;
 		public double MaxTargetAltitude;
@@ -150,6 +163,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool CheckThreatScoreIncludeOtherNpcOwners;
 		public GridConfigurationEnum CheckThreatScoreGridConfiguration;
 		public bool CheckThreatScoreFromTargetPosition;
+		public bool CheckThreatScoreFromClosestPlayerPosition;
 
 		public bool CompareThreatScore;
 		public int CompareThreatScoreValue;
@@ -180,8 +194,14 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 		public bool CheckForBlocksOfType;
 		public List<string> BlocksOfType = new List<string>();
 
+		public bool NoActiveContracts;
+
+
 		public bool CheckForSpawnConditions;
 		public List<string> RequiredSpawnConditions;
+
+		public bool CheckIfSpawnGroupExist;
+		public string ExistingSpawnGroupName;
 
 		public bool CheckForPlanetaryLane;
 		public bool PlanetaryLanePassValue;
@@ -229,6 +249,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			CustomCountersTargets = new List<int>();
 			AllowAnyValidCounter = false;
 
+			CustomCountersTargetOverrideCommandScore = false;
+			CustomCountersTargetOverrideSelfScore = false;
+
+
 			CheckTrueSandboxBooleans = false;
 			TrueSandboxBooleans = new List<string>();
 			AllowAnyTrueSandboxBoolean = false;
@@ -246,6 +270,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			MinGridSpeed = -1;
 			MaxGridSpeed = -1;
 
+			CheckGridVerticalSpeed = false;
+			MinGridVerticalSpeed = -1;
+			MaxGridVerticalSpeed = -1;
+
+
+			
 			CheckMESBlacklistedSpawnGroups = false;
 			SpawnGroupBlacklistContainsAll = new List<string>();
 			SpawnGroupBlacklistContainsAny = new List<string>();
@@ -306,6 +336,8 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			MinAltitude = -1;
 			MaxAltitude = -1;
 
+			IsOnDarkSide = false;
+
 			TargetAltitudeCheck = false;
 			MinTargetAltitude = -1;
 			MaxTargetAltitude = -1;
@@ -351,6 +383,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			CheckThreatScoreIncludeOtherNpcOwners = false;
 			CheckThreatScoreGridConfiguration = GridConfigurationEnum.All;
 			CheckThreatScoreFromTargetPosition = false;
+			CheckThreatScoreFromClosestPlayerPosition = false;
 
 			CompareThreatScore = false;
 			CompareThreatScoreValue = -1;
@@ -372,9 +405,16 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 			CheckForSpawnConditions = false;
 			RequiredSpawnConditions = new List<string>();
 
+
+			CheckIfSpawnGroupExist = false;
+			ExistingSpawnGroupName = "";
+
+
+
 			CheckForPlanetaryLane = false;
 			PlanetaryLanePassValue = true;
 
+			NoActiveContracts = false;
 
 			CheckPlayerReputation = false;
 			CheckReputationwithFaction = new List<string>();
@@ -404,17 +444,25 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"TrueBooleans", (s, o) => TagParse.TagStringListCheck(s, ref TrueBooleans) },
 				{"AllowAnyTrueBoolean", (s, o) => TagParse.TagBoolCheck(s, ref AllowAnyTrueBoolean) },
 				{"CheckFalseBooleans", (s, o) => TagParse.TagBoolCheck(s, ref CheckFalseBooleans) },
-				{"FalseBooleans", (s, o) => TagParse.TagStringListCheck(s, ref TrueBooleans) },
+				{"FalseBooleans", (s, o) => TagParse.TagStringListCheck(s, ref FalseBooleans) },
 				{"AllowAnyFalseBoolean", (s, o) => TagParse.TagBoolCheck(s, ref AllowAnyFalseBoolean) },
 
 
 				{"CheckCustomCounters", (s, o) => TagParse.TagBoolCheck(s, ref CheckCustomCounters) },
 				{"CustomCounters", (s, o) => TagParse.TagStringListCheck(s, ref CustomCounters) },
-				{"CustomCountersTargets", (s, o) => TagParse.TagIntListCheck(s, ref CustomCountersTargets) },
+				{"CustomCountersTargets", (s, o) => TagParse.TagIntListCheck(s, true ,ref CustomCountersTargets) },
+				{"CustomCountersTargetOverrideCommandScore", (s, o) => TagParse.TagBoolCheck(s, ref CustomCountersTargetOverrideCommandScore) },
+				{"CustomCountersTargetOverrideSelfScore", (s, o) => TagParse.TagBoolCheck(s, ref CustomCountersTargetOverrideSelfScore) },
 				{"AllowAnyValidCounter", (s, o) => TagParse.TagBoolCheck(s, ref AllowAnyValidCounter) },
 				{"CheckGridSpeed", (s, o) => TagParse.TagBoolCheck(s, ref CheckGridSpeed) },
 				{"MinGridSpeed", (s, o) => TagParse.TagFloatCheck(s, ref MinGridSpeed) },
 				{"MaxGridSpeed", (s, o) => TagParse.TagFloatCheck(s, ref MaxGridSpeed) },
+
+				{"CheckGridVerticalSpeed", (s, o) => TagParse.TagBoolCheck(s, ref CheckGridVerticalSpeed) },
+				{"MinGridVerticalSpeed", (s, o) => TagParse.TagFloatCheck(s, ref MinGridVerticalSpeed) },
+				{"MaxGridVerticalSpeed", (s, o) => TagParse.TagFloatCheck(s, ref MaxGridVerticalSpeed) },
+
+
 				{"CheckMESBlacklistedSpawnGroups", (s, o) => TagParse.TagBoolCheck(s, ref CheckMESBlacklistedSpawnGroups) },
 				{"SpawnGroupBlacklistContainsAll", (s, o) => TagParse.TagStringListCheck(s, ref SpawnGroupBlacklistContainsAll) },
 				{"SpawnGroupBlacklistContainsAny", (s, o) => TagParse.TagStringListCheck(s, ref SpawnGroupBlacklistContainsAny) },
@@ -473,6 +521,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"AltitudeCheck", (s, o) => TagParse.TagBoolCheck(s, ref AltitudeCheck) },
 				{"MinAltitude", (s, o) => TagParse.TagDoubleCheck(s, ref MinAltitude) },
 				{"MaxAltitude", (s, o) => TagParse.TagDoubleCheck(s, ref MaxAltitude) },
+				{"IsOnDarkSide", (s, o) => TagParse.TagBoolCheck(s, ref IsOnDarkSide) },
 				{"TargetAltitudeCheck", (s, o) => TagParse.TagBoolCheck(s, ref TargetAltitudeCheck) },
 				{"MinTargetAltitude", (s, o) => TagParse.TagDoubleCheck(s, ref MinTargetAltitude) },
 				{"MaxTargetAltitude", (s, o) => TagParse.TagDoubleCheck(s, ref MaxTargetAltitude) },
@@ -488,6 +537,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"IsTargetStatic", (s, o) => TagParse.TagBoolCheck(s, ref IsTargetStatic) },
 				{"HasTarget", (s, o) => TagParse.TagBoolCheck(s, ref HasTarget) },
 				{"NoTarget", (s, o) => TagParse.TagBoolCheck(s, ref NoTarget) },
+				{"NoActiveContracts", (s, o) => TagParse.TagBoolCheck(s, ref NoActiveContracts) },
 				{"IsAttackerHostile", (s, o) => TagParse.TagBoolCheck(s, ref IsAttackerHostile) }, //
 				{"IsAttackerNeutral", (s, o) => TagParse.TagBoolCheck(s, ref IsAttackerNeutral) },
 				{"IsAttackerFriendly", (s, o) => TagParse.TagBoolCheck(s, ref IsAttackerFriendly) },
@@ -504,6 +554,7 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"CheckThreatScoreIncludeOtherNpcOwners", (s, o) => TagParse.TagBoolCheck(s, ref CheckThreatScoreIncludeOtherNpcOwners) },
 				{"CheckThreatScoreGridConfiguration", (s, o) => TagParse.TagGridConfigurationCheck(s, ref CheckThreatScoreGridConfiguration) },
 				{"CheckThreatScoreFromTargetPosition", (s, o) => TagParse.TagBoolCheck(s, ref CheckThreatScoreFromTargetPosition) },
+				{"CheckThreatScoreFromClosestPlayerPosition", (s, o) => TagParse.TagBoolCheck(s, ref CheckThreatScoreFromClosestPlayerPosition) },
 				{"CompareThreatScore", (s, o) => TagParse.TagBoolCheck(s, ref CompareThreatScore) },
 				{"CompareThreatScoreValue", (s, o) => TagParse.TagIntCheck(s, ref CompareThreatScoreValue) },
 				{"CompareThreatScoreUseSelfValue", (s, o) => TagParse.TagBoolCheck(s, ref CompareThreatScoreUseSelfValue) },
@@ -521,6 +572,12 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 				{"BlocksOfType", (s, o) => TagParse.TagStringListCheck(s, ref BlocksOfType) },
 				{"CheckForSpawnConditions", (s, o) => TagParse.TagBoolCheck(s, ref CheckForSpawnConditions) },
 				{"RequiredSpawnConditions", (s, o) => TagParse.TagStringListCheck(s, ref RequiredSpawnConditions) },
+
+				{"CheckIfSpawnGroupExist", (s, o) => TagParse.TagBoolCheck(s, ref CheckIfSpawnGroupExist) },
+				{"ExistingSpawnGroupName", (s, o) => TagParse.TagStringCheck(s, ref ExistingSpawnGroupName) },
+
+
+
 				{"CheckForPlanetaryLane", (s, o) => TagParse.TagBoolCheck(s, ref CheckForPlanetaryLane) },//CheckForPlanetaryLane
 				{"PlanetaryLanePassValue", (s, o) => TagParse.TagBoolCheck(s, ref PlanetaryLanePassValue) },
 				{"CheckPlayerReputation", (s, o) => TagParse.TagBoolCheck(s, ref CheckPlayerReputation) },

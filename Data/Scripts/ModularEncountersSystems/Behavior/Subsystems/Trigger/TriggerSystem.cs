@@ -546,6 +546,16 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
 			}
 
+			if(receivedCommand.RemoteControl != null)
+            {
+				if (receivedCommand.RemoteControl.EntityId != 0 && receivedCommand.RemoteControl.EntityId == RemoteControl.EntityId)
+				{
+					BehaviorLogger.Write("The command hit the originating grid", BehaviorDebugEnum.Command);
+					return;
+				}
+
+			}
+
 
 			if (!receivedCommand.FromEvent && (receivedCommand.SenderEntity?.PositionComp == null || RemoteControl?.SlimBlock?.CubeGrid == null)) {
 
@@ -631,9 +641,10 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 
                 if (trigger.AllowUniqueCommandCodeSenderOnly)
                 {
-					string uniquestringid = receivedCommand.SenderEntity.EntityId.ToString() + commandreceivecode;
+					string uniquestringid = (receivedCommand.SenderEntity?.EntityId.ToString() ?? "UnknownSender") + commandreceivecode;
 
-                    if (_settings.ReceivedCommandSenderCode.Contains(uniquestringid))
+
+					if (_settings.ReceivedCommandSenderCode.Contains(uniquestringid))
                     {
 						continue;
                     }
@@ -1311,14 +1322,23 @@ namespace ModularEncountersSystems.Behavior.Subsystems.Trigger {
 					continue;
 
 
+
 				if (control.MinPlayerReputation != -1501 || control.MaxPlayerReputation != 1501)
 				{
-					var customfaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(control.FactionTag);
-
 					long factionId = 0;
 
-					if (customfaction != null)
-						factionId = customfaction.FactionId;
+					if (control.UseCustomFactionTag == true)
+					{
+						var customfaction = MyAPIGateway.Session.Factions.TryGetFactionByTag(control.FactionTag);
+
+						if (customfaction != null)
+							factionId = customfaction.FactionId;
+					}
+					else
+					{
+						factionId = _owner.FactionId;
+
+					}
 
 
 					if (factionId != 0)
